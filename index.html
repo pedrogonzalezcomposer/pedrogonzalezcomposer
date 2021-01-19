@@ -1,23 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>zo</title>
+		<title>violin dance</title>
 		<meta charset="utf-8">
 		<meta name="generator" content="Three.js Editor">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: sans-serif;
-				font-size: 11px;
-				background-color: #000;
-				margin: 0px;
-			}
-			canvas {
-				display: block;
-			}
-		</style>
-	</head>
+	
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/2.4.3/webcomponents-bundle.js"></script>
+		<link href="https://fonts.googleapis.com/css?family=Material+Icons&display=block" rel="stylesheet"/>
+		<script src="../build/Tone.js"></script>
+		<script src="./js/tone-ui.js"></script>
+		<script src="./js/components.js"></script>
+		<script src="p5.min.js"></script>
+    	<script src="p5.dom.min.js"></script>
+    	<link rel="stylesheet" type="text/css" href="style.css">
+	
+	</head>	
+
 	<body ontouchstart="">
+
+			<div id="content">
+				<tone-play-toggle></tone-play-toggle>
+			</div>
+		
+		<script type="text/javascript">
+
+			// the player
+			const player = new Tone.GrainPlayer({
+				url: "../audio/song5.wav",
+				loop: true,
+				grainSize: 0.3,
+				overlap: 0.01,
+				volume: 0.1,
+				
+				
+			}).toDestination();
+	
+			// bind the interface
+			document.querySelector("tone-play-toggle").addEventListener("start", () => player.start());
+			document.querySelector("tone-play-toggle").addEventListener("stop", () => player.stop());
+		
+		
+		</script>
+
 		<script type="module">
 
 			import * as THREE from './js/three.module.js';
@@ -40,12 +65,102 @@
 				window.addEventListener( 'resize', function () {
 
 					player.setSize( window.innerWidth, window.innerHeight );
-
 				} );
-
 			} );
+</script>
 
+<script type="module">
 
-		</script>
-	</body>
+	import * as THREE from './js/three.module.js';
+	import { APP } from './js/app.js';
+	import { VRButton } from './js/VRButton.js';
+
+	window.THREE = THREE; // Used by APP Scripts.
+	window.VRButton = VRButton; // Used by APP Scripts.
+
+	var loader = new THREE.FileLoader();
+	loader.load( 'app2.json', function ( text ) {
+
+		var player = new APP.Player();
+		player.load( JSON.parse( text ) );
+		player.setSize( window.innerWidth, window.innerHeight );
+		player.play();
+
+		document.body.appendChild( player.dom );
+
+		window.addEventListener( 'resize', function () {
+
+			player.setSize( window.innerWidth, window.innerHeight );
+		} );
+	} );
+</script>
+
+<script>
+
+	var loop = new Tone.Loop(playTone, '4n').start(0);
+Tone.Transport.bpm.value = 20;
+Tone.Transport.start();
+
+var sampler = new Tone.Sampler({
+    
+	"F4" : "ah_F4.wav",
+    "G4" : "Ah_G4.wav",
+    "A4" : "Ah_A4.wav",
+    "C5" : "Ah_C5.wav",
+    "D5" : "Ah_D5.wav",
+    "F5" : "Ah_F5.wav",
+  
+// 	74 : "ah_F4.wav",
+//     76 : "Ah_G4.wav",
+//     78 : "Ah_A4.wav",
+//     81 : "Ah_C5.wav",
+//     83 : "Ah_D5.wav",
+//     86 : "Ah_F5.wav",
+	
+}).toMaster();
+
+let prevMouseY;
+
+function setup() {
+  createCanvas(2000,100);
+  background(115,0,0);
+   prevMouseY=mouseY;
+}
+
+// }
+  
+function draw() {
+if  (mouseY!=prevMouseY) {
+  playTone();
+}
+  
+prevMouseY=mouseY;
+  
+}
+
+function playTone() {
+// let noteMapped=map(openingSize,0.,20.,74,86);
+let noteMapped=map(mouseY,height,10,76,81,);
+let midiNote=round(noteMapped); 
+let noteObject = Tone.Frequency(midiNote, "midi");
+sampler.triggerAttackRelease(noteObject, 0.1);
+console.log(midiNote);
+}
+
+function keyPressed() {
+  
+if (key=='d' || key=='D' ) {
+let noteObject = Tone.Frequency(83, "midi");
+sampler.triggerAttackRelease(noteObject, 100);  
+}
+  
+ if (key=='b' || key=='B' ) {
+   let noteObject = Tone.Frequency(73, "midi");
+sampler.triggerAttackRelease(noteObject, 100) ; 
+}
+   
+}
+
+</script>
+</body>
 </html>
